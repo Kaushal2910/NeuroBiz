@@ -45,34 +45,44 @@ async def generate_ai_response(
 
     try:
 
-        print(
-            "Generating Gemini response..."
-        )
-
         response = model.generate_content(
             user_message,
 
             generation_config={
-                "temperature": 0.5,
-                "top_p": 0.8,
-                "top_k": 20,
+                "temperature": 0.6,
+                "top_p": 0.9,
+                "top_k": 40,
                 "max_output_tokens": 256,
             }
         )
 
-        print(
-            "Gemini response received"
-        )
+        candidates = response.candidates
 
         if (
-            response
-            and hasattr(response, "text")
-            and response.text
+            candidates
+            and len(candidates) > 0
         ):
 
-            return (
-                response.text.strip()
+            content_parts = (
+                candidates[0]
+                .content.parts
             )
+
+            final_text = ""
+
+            for part in content_parts:
+
+                if hasattr(part, "text"):
+                    final_text += (
+                        part.text
+                    )
+
+            final_text = (
+                final_text.strip()
+            )
+
+            if final_text:
+                return final_text
 
         return (
             "Unable to generate response."
