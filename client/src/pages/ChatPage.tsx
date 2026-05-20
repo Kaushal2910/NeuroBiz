@@ -1,6 +1,4 @@
-//C:\Users\sonaw\OneDrive\Desktop\NeuroBiz\client\src\pages\ChatPage.tsx
-
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 import DashboardLayout from "../layouts/DashboardLayout";
 
@@ -9,39 +7,22 @@ import ChatWindow from "../components/chat/ChatWindow";
 import { useChatStore } from "../store/chatStore";
 
 const ChatPage = () => {
-  const [input, setInput] = useState("");
+  const [input, setInput] =
+    useState("");
 
-  const textareaRef =
-    useRef<HTMLTextAreaElement | null>(null);
-
-  const {
-    sendMessage,
-    isTyping,
-  } = useChatStore();
-
-  const handleSendMessage = () => {
-    if (!input.trim()) return;
-
-    sendMessage(input.trim());
-
-    setInput("");
-
-    // Reset textarea height
-    if (textareaRef.current) {
-      textareaRef.current.style.height =
-        "auto";
-    }
-  };
+  const { sendMessage } =
+    useChatStore();
 
   return (
     <DashboardLayout>
 
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+      <div className="h-full flex flex-col">
 
         {/* HEADER */}
         <div
           className="
             h-20
+            shrink-0
             border-b
             border-white/10
             px-8
@@ -50,11 +31,9 @@ const ChatPage = () => {
             justify-between
             bg-black/20
             backdrop-blur-xl
-            shrink-0
           "
         >
 
-          {/* LEFT */}
           <div>
 
             <h2 className="text-2xl font-bold">
@@ -67,7 +46,6 @@ const ChatPage = () => {
 
           </div>
 
-          {/* RIGHT */}
           <div
             className="
               px-4
@@ -87,12 +65,23 @@ const ChatPage = () => {
 
         </div>
 
-        {/* CHAT WINDOW */}
-        <ChatWindow />
-        
+        {/* CHAT */}
+        <div className="flex-1 overflow-hidden">
 
-        {/* INPUT AREA */}
-        <div className="p-6 border-t border-white/10 shrink-0">
+          <ChatWindow />
+
+        </div>
+
+        {/* INPUT */}
+        <div
+          className="
+            shrink-0
+            p-6
+            border-t
+            border-white/10
+            bg-background
+          "
+        >
 
           <div
             className="
@@ -110,22 +99,22 @@ const ChatPage = () => {
             "
           >
 
-            {/* TEXTAREA */}
             <textarea
-              ref={textareaRef}
               placeholder="Ask NeuroBiz AI anything..."
               rows={1}
               value={input}
-              disabled={isTyping}
               onChange={(e) =>
                 setInput(e.target.value)
               }
               onInput={(e) => {
-                e.currentTarget.style.height =
-                  "auto";
+                const target =
+                  e.currentTarget;
 
-                e.currentTarget.style.height =
-                  e.currentTarget.scrollHeight +
+                target.style.height =
+                  "24px";
+
+                target.style.height =
+                  target.scrollHeight +
                   "px";
               }}
               onKeyDown={(e) => {
@@ -135,7 +124,9 @@ const ChatPage = () => {
                 ) {
                   e.preventDefault();
 
-                  handleSendMessage();
+                  sendMessage(input);
+
+                  setInput("");
                 }
               }}
               className="
@@ -147,14 +138,15 @@ const ChatPage = () => {
                 placeholder:text-gray-500
                 max-h-[200px]
                 custom-scrollbar
-                disabled:opacity-50
               "
             />
 
-            {/* BUTTON */}
             <button
-              onClick={handleSendMessage}
-              disabled={isTyping}
+              onClick={() => {
+                sendMessage(input);
+
+                setInput("");
+              }}
               className="
                 px-6
                 py-3
@@ -166,12 +158,10 @@ const ChatPage = () => {
                 hover:scale-[1.02]
                 transition-all
                 duration-300
-                disabled:opacity-50
-                disabled:hover:scale-100
               "
             >
 
-              {isTyping ? "Thinking..." : "Send"}
+              Send
 
             </button>
 

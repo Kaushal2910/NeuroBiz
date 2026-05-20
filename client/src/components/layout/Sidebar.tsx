@@ -1,3 +1,4 @@
+//C:\Users\sonaw\OneDrive\Desktop\NeuroBiz\client\src\components\layout\Sidebar.tsx
 import {
   Plus,
   MessageSquare,
@@ -12,7 +13,7 @@ import {
 import { useSidebarStore } from "../../store/sidebarStore";
 
 import { useChatStore } from "../../store/chatStore";
-
+import { useEffect, useRef } from "react";
 
 
 const Sidebar = () => {
@@ -38,6 +39,8 @@ const Sidebar = () => {
             ? "w-[110px]"
             : "w-[320px]"
         }
+        h-screen
+        shrink-0
         border-r
         border-white/10
         bg-black/20
@@ -47,6 +50,8 @@ const Sidebar = () => {
         transition-all
         duration-500
       `}
+
+
     >
 
       {/* LOGO */}
@@ -219,7 +224,7 @@ const Sidebar = () => {
       </div>
 
       {/* CHAT HISTORY */}
-      <div className="mt-10 flex-1 overflow-y-auto">
+      <div className="mt-10 flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-1">
 
         {!collapsed && (
           <p className="text-xs uppercase text-gray-500 tracking-wider mb-4">

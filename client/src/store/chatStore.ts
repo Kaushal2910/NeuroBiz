@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 export interface ChatMessage {
-  id: number;
+  id: string;
 
   role: "user" | "assistant";
 
@@ -11,7 +11,7 @@ export interface ChatMessage {
 }
 
 export interface Conversation {
-  id: number;
+  id: string;
 
   title: string;
 
@@ -21,22 +21,22 @@ export interface Conversation {
 interface ChatStore {
   conversations: Conversation[];
 
-  activeConversationId: number;
+  activeConversationId: string;
 
   isTyping: boolean;
 
   createConversation: () => void;
 
   setActiveConversation: (
-    id: number
+    id: string
   ) => void;
 
   deleteConversation: (
-    id: number
+    id: string
   ) => void;
 
   renameConversation: (
-    id: number,
+    id: string,
     title: string
   ) => void;
 
@@ -45,6 +45,10 @@ interface ChatStore {
   ) => void;
 }
 
+const generateId = () => {
+  return crypto.randomUUID();
+};
+
 const getTime = () => {
   return new Date().toLocaleTimeString([], {
     hour: "2-digit",
@@ -52,17 +56,20 @@ const getTime = () => {
   });
 };
 
+const initialConversationId =
+  generateId();
+
 export const useChatStore =
   create<ChatStore>((set, get) => ({
     conversations: [
       {
-        id: 1,
+        id: initialConversationId,
 
         title: "New Conversation",
 
         messages: [
           {
-            id: 1,
+            id: generateId(),
 
             role: "assistant",
 
@@ -75,18 +82,34 @@ export const useChatStore =
       },
     ],
 
-    activeConversationId: 1,
+    activeConversationId:
+      initialConversationId,
 
     isTyping: false,
 
     createConversation: () => {
-      const newConversation = {
-        id: Date.now(),
+      const newConversationId =
+        generateId();
 
-        title: "Untitled Chat",
+      const newConversation: Conversation =
+        {
+          id: newConversationId,
 
-        messages: [],
-      };
+          title: "Untitled Chat",
+
+          messages: [
+            {
+              id: generateId(),
+
+              role: "assistant",
+
+              content:
+                "Hello 👋 Start a new conversation with NeuroBiz AI.",
+
+              timestamp: getTime(),
+            },
+          ],
+        };
 
       set((state) => ({
         conversations: [
@@ -95,11 +118,13 @@ export const useChatStore =
         ],
 
         activeConversationId:
-          newConversation.id,
+          newConversationId,
       }));
     },
 
-    setActiveConversation: (id) => {
+    setActiveConversation: (
+      id
+    ) => {
       set({
         activeConversationId: id,
       });
@@ -108,16 +133,18 @@ export const useChatStore =
     deleteConversation: (id) => {
       const state = get();
 
-      const updated =
+      const updatedConversations =
         state.conversations.filter(
           (chat) => chat.id !== id
         );
 
       set({
-        conversations: updated,
+        conversations:
+          updatedConversations,
 
         activeConversationId:
-          updated[0]?.id || 0,
+          updatedConversations[0]?.id ||
+          "",
       });
     },
 
@@ -130,7 +157,10 @@ export const useChatStore =
           state.conversations.map(
             (chat) =>
               chat.id === id
-                ? { ...chat, title }
+                ? {
+                    ...chat,
+                    title,
+                  }
                 : chat
           ),
       }));
@@ -141,17 +171,18 @@ export const useChatStore =
 
       const state = get();
 
-      const current =
+      const currentConversation =
         state.conversations.find(
-          (c) =>
-            c.id ===
+          (chat) =>
+            chat.id ===
             state.activeConversationId
         );
 
-      if (!current) return;
+      if (!currentConversation)
+        return;
 
       const userMessage: ChatMessage = {
-        id: Date.now(),
+        id: generateId(),
 
         role: "user",
 
@@ -161,7 +192,7 @@ export const useChatStore =
       };
 
       const updatedMessages = [
-        ...current.messages,
+        ...currentConversation.messages,
         userMessage,
       ];
 
@@ -169,14 +200,17 @@ export const useChatStore =
         conversations:
           state.conversations.map(
             (chat) =>
-              chat.id === current.id
+              chat.id ===
+              currentConversation.id
                 ? {
                     ...chat,
+
                     messages:
                       updatedMessages,
 
                     title:
-                      chat.messages.length === 0
+                      chat.title ===
+                      "Untitled Chat"
                         ? content.slice(
                             0,
                             30
@@ -191,7 +225,7 @@ export const useChatStore =
 
       setTimeout(() => {
         const aiMessage: ChatMessage = {
-          id: Date.now(),
+          id: generateId(),
 
           role: "assistant",
 
@@ -204,7 +238,7 @@ NeuroBiz AI analyzed your request and generated intelligent recommendations.
 • Improve customer engagement  
 • Increase lead conversion  
 • Generate AI analytics  
-• Streamline operations
+• Streamline operations  
 
 \`\`\`python
 def automate_business():
@@ -222,7 +256,8 @@ def automate_business():
           conversations:
             latestState.conversations.map(
               (chat) =>
-                chat.id === current.id
+                chat.id ===
+                currentConversation.id
                   ? {
                       ...chat,
 

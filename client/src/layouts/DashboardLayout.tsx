@@ -10,13 +10,20 @@ const DashboardLayout = ({
   children,
 }: Props) => {
   return (
-    <div className="min-h-screen bg-background text-white flex overflow-hidden">
+    <div
+      className="
+        h-screen
+        flex
+        bg-background
+        text-white
+      "
+    >
 
       {/* SIDEBAR */}
       <Sidebar />
 
-      {/* MAIN CONTENT */}
-      <main className="flex-1 overflow-y-auto">
+      {/* MAIN */}
+      <main className="flex-1 overflow-hidden">
 
         {children}
 
