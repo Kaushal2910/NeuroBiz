@@ -56,7 +56,7 @@ async def generate_ai_response(
                 "temperature": 0.5,
                 "top_p": 0.8,
                 "top_k": 20,
-                "max_output_tokens": 120,
+                "max_output_tokens": 256,
             }
         )
 
