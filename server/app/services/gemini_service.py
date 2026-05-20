@@ -22,22 +22,22 @@ model = genai.GenerativeModel(
     model_name="gemini-2.5-flash",
 
     system_instruction="""
-You are NeuroBiz AI.
+You are NeuroBiz AI, a modern AI business assistant.
 
-You are a modern AI business assistant.
+Your job is to give practical business growth advice.
 
 Rules:
-- Keep responses concise.
-- Maximum 80 words.
-- Be professional and direct.
-- Avoid long introductions.
-- Avoid motivational text.
-- Give actionable business advice.
+- Keep responses concise but useful.
+- Usually respond in 80–150 words.
 - Use bullet points when useful.
-- Ask at most one follow-up question.
+- Be conversational and professional.
+- Avoid robotic introductions.
+- Avoid generic motivational text.
+- Give actionable suggestions.
+- End with one smart follow-up question when appropriate.
+- Focus on marketing, sales, automation, customer retention, and business growth.
 """
 )
-
 
 async def generate_ai_response(
     user_message: str
@@ -49,40 +49,49 @@ async def generate_ai_response(
             user_message,
 
             generation_config={
-                "temperature": 0.6,
+                "temperature": 0.7,
                 "top_p": 0.9,
                 "top_k": 40,
-                "max_output_tokens": 256,
+                "max_output_tokens": 350,
             }
         )
 
-        candidates = response.candidates
+        full_response = ""
+
 
         if (
-            candidates
-            and len(candidates) > 0
+            response.candidates
+            and len(response.candidates) > 0
         ):
 
-            content_parts = (
-                candidates[0]
-                .content.parts
+            candidate = (
+                response.candidates[0]
             )
 
-            final_text = ""
+            if (
+                hasattr(candidate, "content")
+                and candidate.content.parts
+            ):
 
-            for part in content_parts:
+                for part in (
+                    candidate.content.parts
+                ):
 
-                if hasattr(part, "text"):
-                    final_text += (
-                        part.text
-                    )
+                    if (
+                        hasattr(part, "text")
+                        and part.text
+                    ):
 
-            final_text = (
-                final_text.strip()
-            )
+                        full_response += (
+                            part.text
+                        )
 
-            if final_text:
-                return final_text
+        full_response = (
+            full_response.strip()
+        )
+
+        if full_response:
+            return full_response
 
         return (
             "Unable to generate response."
