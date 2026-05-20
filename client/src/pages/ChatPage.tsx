@@ -1,4 +1,8 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import DashboardLayout from "../layouts/DashboardLayout";
 
@@ -10,6 +14,12 @@ const ChatPage = () => {
 
   const [input, setInput] =
     useState("");
+
+  const [selectedFile, setSelectedFile] =
+    useState<File | null>(null);
+
+  const fileInputRef =
+    useRef<HTMLInputElement>(null);
 
   const {
     sendMessage,
@@ -25,14 +35,24 @@ const ChatPage = () => {
 
   const handleSendMessage = () => {
 
-    if (!input.trim()) return;
+    if (
+      !input.trim()
+      &&
+      !selectedFile
+    ) return;
 
-    sendMessage(input);
+    sendMessage(
+      input,
+      selectedFile
+    );
 
     setInput("");
+
+    setSelectedFile(null);
   };
 
   return (
+
     <DashboardLayout>
 
       <div className="h-full flex flex-col overflow-hidden">
@@ -119,76 +139,155 @@ const ChatPage = () => {
               backdrop-blur-xl
               p-4
               flex
-              items-end
-              gap-4
+              flex-col
+              gap-3
             "
           >
 
-            <textarea
-              placeholder="Ask NeuroBiz AI about automation, growth, analytics..."
-              rows={1}
-              value={input}
-              onChange={(e) =>
-                setInput(e.target.value)
-              }
+            {/* FILE NAME */}
+            {selectedFile && (
 
-              onInput={(e) => {
+              <div
+                className="
+                  text-sm
+                  text-cyan-400
+                  px-2
+                "
+              >
 
-                const target =
-                  e.currentTarget;
+                📄 {selectedFile.name}
 
-                target.style.height =
-                  "24px";
+              </div>
+            )}
 
-                target.style.height =
-                  `${target.scrollHeight}px`;
-              }}
-
-              onKeyDown={(e) => {
-
-                if (
-                  e.key === "Enter" &&
-                  !e.shiftKey
-                ) {
-
-                  e.preventDefault();
-
-                  handleSendMessage();
-                }
-              }}
-
+            <div
               className="
-                flex-1
-                bg-transparent
-                resize-none
-                outline-none
-                text-white
-                placeholder:text-gray-500
-                max-h-[200px]
-                overflow-y-auto
-                custom-scrollbar
-              "
-            />
-
-            <button
-              onClick={handleSendMessage}
-              className="
-                px-6
-                py-3
-                rounded-2xl
-                bg-gradient-to-r
-                from-cyan-500
-                to-purple-600
-                font-medium
-                hover:scale-[1.02]
-                transition-all
-                duration-300
+                flex
+                items-end
+                gap-4
               "
             >
 
-              Send
+              {/* TEXTAREA */}
+              <textarea
+                placeholder="Ask NeuroBiz AI about automation, growth, analytics..."
+                rows={1}
+                value={input}
 
-            </button>
+                onChange={(e) =>
+                  setInput(
+                    e.target.value
+                  )
+                }
+
+                onInput={(e) => {
+
+                  const target =
+                    e.currentTarget;
+
+                  target.style.height =
+                    "24px";
+
+                  target.style.height =
+                    `${target.scrollHeight}px`;
+                }}
+
+                onKeyDown={(e) => {
+
+                  if (
+                    e.key === "Enter"
+                    &&
+                    !e.shiftKey
+                  ) {
+
+                    e.preventDefault();
+
+                    handleSendMessage();
+                  }
+                }}
+
+                className="
+                  flex-1
+                  bg-transparent
+                  resize-none
+                  outline-none
+                  text-white
+                  placeholder:text-gray-500
+                  max-h-[200px]
+                  overflow-y-auto
+                  custom-scrollbar
+                "
+              />
+
+              {/* FILE BUTTON */}
+              <button
+                onClick={() =>
+                  fileInputRef
+                    .current
+                    ?.click()
+                }
+
+                className="
+                  px-4
+                  py-3
+                  rounded-2xl
+                  bg-white/5
+                  border
+                  border-white/10
+                  hover:bg-white/10
+                  transition-all
+                "
+              >
+
+                📎
+
+              </button>
+
+              {/* HIDDEN INPUT */}
+              <input
+                type="file"
+                ref={fileInputRef}
+
+                className="hidden"
+
+                onChange={(e) => {
+
+                  if (
+                    e.target.files?.[0]
+                  ) {
+
+                    setSelectedFile(
+                      e.target.files[0]
+                    );
+                  }
+                }}
+              />
+
+              {/* SEND BUTTON */}
+              <button
+                onClick={
+                  handleSendMessage
+                }
+
+                className="
+                  px-6
+                  py-3
+                  rounded-2xl
+                  bg-gradient-to-r
+                  from-cyan-500
+                  to-purple-600
+                  font-medium
+                  hover:scale-[1.02]
+                  transition-all
+                  duration-300
+                "
+              >
+
+                Send
+
+              </button>
+
+            </div>
 
           </div>
 

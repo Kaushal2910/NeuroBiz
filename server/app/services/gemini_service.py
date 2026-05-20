@@ -38,13 +38,28 @@ Rules:
 )
 
 async def generate_ai_response(
-    user_message: str
+    user_message: str,
+    file_content: str = ""
 ):
 
     try:
 
+        final_prompt = f"""
+User Message:
+{user_message}
+
+Uploaded Document Content:
+{file_content}
+
+Instructions:
+- Analyze the uploaded document carefully.
+- Answer the user's question based on the document.
+- If the file contains business data, provide insights.
+- If no file is uploaded, answer normally.
+"""
+
         response = model.generate_content(
-            user_message,
+            final_prompt,
 
             generation_config={
                 "temperature": 0.7,
@@ -53,8 +68,6 @@ async def generate_ai_response(
                 "max_output_tokens": 1500,
             }
         )
-
-        print(response)
 
         if response.candidates:
 
@@ -65,8 +78,6 @@ async def generate_ai_response(
                 for part in parts
                 if hasattr(part, "text")
             )
-
-            print("FULL TEXT:", full_text)
 
             return full_text.strip()
 

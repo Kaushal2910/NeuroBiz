@@ -39,7 +39,8 @@ interface ChatStore {
   ) => void;
 
   sendMessage: (
-    content: string
+    content: string,
+    file?: File | null
   ) => Promise<void>;
 
   loadHistory: () => Promise<void>;
@@ -244,7 +245,8 @@ export const useChatStore =
     },
 
     sendMessage: async (
-      content: string
+      content: string,
+      file?: File | null
     ) => {
 
       if (!content.trim())
@@ -332,7 +334,8 @@ export const useChatStore =
 
         const aiResponse =
           await sendChatMessage(
-            content
+            content,
+            file
           );
 
         const aiMessage: ChatMessage =
