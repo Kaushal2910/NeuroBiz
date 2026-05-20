@@ -136,7 +136,7 @@ const Sidebar = () => {
         <button
           onClick={createConversation}
           className="
-            mt-5
+            mt-4
             w-full
             flex
             items-center
