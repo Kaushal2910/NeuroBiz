@@ -1,10 +1,28 @@
+import MainLayout from "../layouts/MainLayout";
+
+import HeroSection from "../components/landing/HeroSection";
+import FeaturesSection from "../components/landing/FeaturesSection";
+import AIShowcase from "../components/landing/AIShowcase";
+import DashboardPreview from "../components/landing/DashboardPreview";
+import CTASection from "../components/landing/CTASection";
+import Footer from "../components/landing/Footer";
+
 const LandingPage = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <h1 className="text-6xl font-bold gradient-text">
-        NexaFlow AI
-      </h1>
-    </div>
+    <MainLayout>
+
+      <HeroSection />
+
+      <FeaturesSection />
+      <AIShowcase />
+      <DashboardPreview />
+      <CTASection />
+
+      <Footer />
+      
+      
+
+    </MainLayout>
   );
 };
 

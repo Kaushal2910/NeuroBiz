@@ -1,3 +1,5 @@
+/*C:\Users\sonaw\OneDrive\Desktop\NeuroBiz\client\src\index.css*/
+
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
 
 @tailwind base;
@@ -10,11 +12,15 @@
   box-sizing: border-box;
 }
 
+
 html,
 body,
 #root {
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
+  overflow: hidden;
+  min-height: 100%;
+
   font-family: "Inter", sans-serif;
   background: #0b1120;
   color: white;
@@ -34,4 +40,38 @@ body {
 
 .glow-hover {
   @apply transition-all duration-300 hover:shadow-glow;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(6, 182, 212, 0.15),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(139, 92, 246, 0.15),
+      transparent 30%
+    );
+
+  pointer-events: none;
+  z-index: -1;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.15);
+  border-radius: 999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
 }
