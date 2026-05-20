@@ -46,10 +46,13 @@ interface ChatStore {
 }
 
 const getTime = () => {
-  return new Date().toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return new Date().toLocaleTimeString(
+    [],
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  );
 };
 
 const generateId = () => {
@@ -58,31 +61,34 @@ const generateId = () => {
   );
 };
 
+const createWelcomeConversation =
+  (): Conversation => ({
+    id: generateId(),
+
+    title: "New Chat",
+
+    messages: [
+      {
+        id: generateId(),
+
+        role: "assistant",
+
+        content:
+          "Hi 👋 I'm NeuroBiz AI. How can I help grow your business today?",
+
+        timestamp: getTime(),
+      },
+    ],
+  });
+
 export const useChatStore =
   create<ChatStore>((set, get) => ({
 
     conversations: [
-      {
-        id: 1,
-
-        title: "New Conversation",
-
-        messages: [
-          {
-            id: 1,
-
-            role: "assistant",
-
-            content:
-              "Hi 👋 I'm NeuroBiz AI. How can I help your business today?",
-
-            timestamp: getTime(),
-          },
-        ],
-      },
+      createWelcomeConversation(),
     ],
 
-    activeConversationId: 1,
+    activeConversationId: 0,
 
     isTyping: false,
 
@@ -93,18 +99,27 @@ export const useChatStore =
         const history =
           await getChatHistory();
 
+        if (
+          !history ||
+          history.length === 0
+        ) {
+          return;
+        }
+
         const formatted: Conversation[] =
           history.map(
             (
               item: any,
-              index: number
+              
             ): Conversation => ({
 
-              id: index + 1,
+              id: generateId(),
 
               title:
-                item.user_message?.slice(0, 30) ||
-                "Business Chat",
+                item.user_message?.slice(
+                  0,
+                  30
+                ) || "Business Chat",
 
               messages: [
                 {
@@ -132,15 +147,20 @@ export const useChatStore =
             })
           );
 
-        if (formatted.length > 0) {
+        const currentActive =
+          get()
+            .activeConversationId;
 
-          set({
-            conversations: formatted,
+        set({
+          conversations: [
+            ...formatted,
+            ...get().conversations,
+          ],
 
-            activeConversationId:
-              formatted[0].id,
-          });
-        }
+          activeConversationId:
+            currentActive ||
+            formatted[0].id,
+        });
 
       } catch (error) {
 
@@ -153,28 +173,13 @@ export const useChatStore =
 
     createConversation: () => {
 
-      const newConversation: Conversation = {
-
-        id: generateId(),
-
-        title: "Untitled Chat",
-
-        messages: [
-          {
-            id: generateId(),
-
-            role: "assistant",
-
-            content:
-              "Hi 👋 What business challenge can I help with?",
-
-            timestamp: getTime(),
-          },
-        ],
-      };
+      const newConversation =
+        createWelcomeConversation();
 
       set(
-        (state): Partial<ChatStore> => ({
+        (
+          state
+        ): Partial<ChatStore> => ({
 
           conversations: [
             newConversation,
@@ -200,11 +205,10 @@ export const useChatStore =
       id: number
     ) => {
 
-      const state = get();
-
       const updated =
-        state.conversations.filter(
-          (chat) => chat.id !== id
+        get().conversations.filter(
+          (chat) =>
+            chat.id !== id
         );
 
       set({
@@ -221,7 +225,9 @@ export const useChatStore =
     ) => {
 
       set(
-        (state): Partial<ChatStore> => ({
+        (
+          state
+        ): Partial<ChatStore> => ({
 
           conversations:
             state.conversations.map(
@@ -241,30 +247,57 @@ export const useChatStore =
       content: string
     ) => {
 
-      if (!content.trim()) return;
+      if (!content.trim())
+        return;
 
-      const state = get();
+      let state = get();
 
-      const currentConversation =
+      let currentConversation =
         state.conversations.find(
           (c) =>
             c.id ===
             state.activeConversationId
         );
 
-      if (!currentConversation)
-        return;
+      if (
+        !currentConversation
+      ) {
 
-      const userMessage: ChatMessage = {
+        const newConversation =
+          createWelcomeConversation();
 
-        id: generateId(),
+        set(
+          (
+            prev
+          ): Partial<ChatStore> => ({
 
-        role: "user",
+            conversations: [
+              newConversation,
+              ...prev.conversations,
+            ],
 
-        content,
+            activeConversationId:
+              newConversation.id,
+          })
+        );
 
-        timestamp: getTime(),
-      };
+        state = get();
+
+        currentConversation =
+          newConversation;
+      }
+
+      const userMessage: ChatMessage =
+        {
+          id: generateId(),
+
+          role: "user",
+
+          content,
+
+          timestamp:
+            getTime(),
+        };
 
       set({
         conversations:
@@ -282,7 +315,7 @@ export const useChatStore =
 
                     title:
                       chat.title ===
-                      "Untitled Chat"
+                      "New Chat"
                         ? content.slice(
                             0,
                             30
@@ -302,18 +335,21 @@ export const useChatStore =
             content
           );
 
-        const aiMessage: ChatMessage = {
+        const aiMessage: ChatMessage =
+          {
+            id: generateId(),
 
-          id: generateId(),
+            role: "assistant",
 
-          role: "assistant",
+            content:
+              aiResponse,
 
-          content: aiResponse,
+            timestamp:
+              getTime(),
+          };
 
-          timestamp: getTime(),
-        };
-
-        const latestState = get();
+        const latestState =
+          get();
 
         set({
           conversations:
