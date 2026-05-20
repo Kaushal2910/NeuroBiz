@@ -1,25 +1,15 @@
-import { motion } from "framer-motion";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
+  y?: number;
+  duration?: number;
 }
 
-const FloatingElement = ({ children }: Props) => {
-  return (
-    <motion.div
-      animate={{
-        y: [0, -12, 0],
-      }}
-      transition={{
-        duration: 4,
-        repeat: Infinity,
-        ease: "easeInOut",
-      }}
-    >
-      {children}
-    </motion.div>
-  );
+const FloatingElement = ({
+  children,
+}: Props) => {
+  return <>{children}</>;
 };
 
 export default FloatingElement;

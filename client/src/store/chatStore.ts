@@ -7,28 +7,20 @@ import {
 
 export interface ChatMessage {
   id: number;
-
   role: "user" | "assistant";
-
   content: string;
-
   timestamp: string;
 }
 
 export interface Conversation {
   id: number;
-
   title: string;
-
   messages: ChatMessage[];
 }
 
 interface ChatStore {
-
   conversations: Conversation[];
-
   activeConversationId: number;
-
   isTyping: boolean;
 
   createConversation: () => void;
@@ -54,18 +46,13 @@ interface ChatStore {
 }
 
 const getTime = () => {
-
-  return new Date().toLocaleTimeString(
-    [],
-    {
-      hour: "2-digit",
-      minute: "2-digit",
-    }
-  );
+  return new Date().toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 };
 
 const generateId = () => {
-
   return Math.floor(
     Math.random() * 100000000
   );
@@ -87,7 +74,7 @@ export const useChatStore =
             role: "assistant",
 
             content:
-              "Hello 👋 I'm NeuroBiz AI. How can I help automate your business today?",
+              "Hi 👋 I'm NeuroBiz AI. How can I help your business today?",
 
             timestamp: getTime(),
           },
@@ -106,58 +93,49 @@ export const useChatStore =
         const history =
           await getChatHistory();
 
-        const formatted =
+        const formatted: Conversation[] =
           history.map(
             (
               item: any,
               index: number
-            ) => ({
+            ): Conversation => ({
+
               id: index + 1,
 
               title:
-                item.user_message.slice(
-                  0,
-                  30
-                ),
+                item.user_message?.slice(0, 30) ||
+                "Business Chat",
 
               messages: [
                 {
-                  id:
-                    generateId(),
+                  id: generateId(),
 
                   role: "user",
 
                   content:
-                    item.user_message,
+                    item.user_message || "",
 
-                  timestamp:
-                    "Now",
+                  timestamp: "Now",
                 },
 
                 {
-                  id:
-                    generateId(),
+                  id: generateId(),
 
-                  role:
-                    "assistant",
+                  role: "assistant",
 
                   content:
-                    item.ai_response,
+                    item.ai_response || "",
 
-                  timestamp:
-                    "Now",
+                  timestamp: "Now",
                 },
               ],
             })
           );
 
-        if (
-          formatted.length > 0
-        ) {
+        if (formatted.length > 0) {
 
           set({
-            conversations:
-              formatted,
+            conversations: formatted,
 
             activeConversationId:
               formatted[0].id,
@@ -166,13 +144,17 @@ export const useChatStore =
 
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "History load error:",
+          error
+        );
       }
     },
 
     createConversation: () => {
 
-      const newConversation = {
+      const newConversation: Conversation = {
+
         id: generateId(),
 
         title: "Untitled Chat",
@@ -184,26 +166,29 @@ export const useChatStore =
             role: "assistant",
 
             content:
-              "Hello 👋 Start a new business conversation with NeuroBiz AI.",
+              "Hi 👋 What business challenge can I help with?",
 
             timestamp: getTime(),
           },
         ],
       };
 
-      set((state) => ({
-        conversations: [
-          newConversation,
-          ...state.conversations,
-        ],
+      set(
+        (state): Partial<ChatStore> => ({
 
-        activeConversationId:
-          newConversation.id,
-      }));
+          conversations: [
+            newConversation,
+            ...state.conversations,
+          ],
+
+          activeConversationId:
+            newConversation.id,
+        })
+      );
     },
 
     setActiveConversation: (
-      id
+      id: number
     ) => {
 
       set({
@@ -212,15 +197,14 @@ export const useChatStore =
     },
 
     deleteConversation: (
-      id
+      id: number
     ) => {
 
       const state = get();
 
       const updated =
         state.conversations.filter(
-          (chat) =>
-            chat.id !== id
+          (chat) => chat.id !== id
         );
 
       set({
@@ -232,30 +216,32 @@ export const useChatStore =
     },
 
     renameConversation: (
-      id,
-      title
+      id: number,
+      title: string
     ) => {
 
-      set((state) => ({
-        conversations:
-          state.conversations.map(
-            (chat) =>
-              chat.id === id
-                ? {
-                    ...chat,
-                    title,
-                  }
-                : chat
-          ),
-      }));
+      set(
+        (state): Partial<ChatStore> => ({
+
+          conversations:
+            state.conversations.map(
+              (chat) =>
+                chat.id === id
+                  ? {
+                      ...chat,
+                      title,
+                    }
+                  : chat
+            ),
+        })
+      );
     },
 
     sendMessage: async (
-      content
+      content: string
     ) => {
 
-      if (!content.trim())
-        return;
+      if (!content.trim()) return;
 
       const state = get();
 
@@ -266,22 +252,19 @@ export const useChatStore =
             state.activeConversationId
         );
 
-      if (
-        !currentConversation
-      )
+      if (!currentConversation)
         return;
 
-      const userMessage: ChatMessage =
-        {
-          id: generateId(),
+      const userMessage: ChatMessage = {
 
-          role: "user",
+        id: generateId(),
 
-          content,
+        role: "user",
 
-          timestamp:
-            getTime(),
-        };
+        content,
+
+        timestamp: getTime(),
+      };
 
       set({
         conversations:
@@ -319,21 +302,18 @@ export const useChatStore =
             content
           );
 
-        const aiMessage: ChatMessage =
-          {
-            id: generateId(),
+        const aiMessage: ChatMessage = {
 
-            role: "assistant",
+          id: generateId(),
 
-            content:
-              aiResponse,
+          role: "assistant",
 
-            timestamp:
-              getTime(),
-          };
+          content: aiResponse,
 
-        const latestState =
-          get();
+          timestamp: getTime(),
+        };
+
+        const latestState = get();
 
         set({
           conversations:
@@ -357,7 +337,10 @@ export const useChatStore =
 
       } catch (error) {
 
-        console.error(error);
+        console.error(
+          "Chat error:",
+          error
+        );
 
         set({
           isTyping: false,

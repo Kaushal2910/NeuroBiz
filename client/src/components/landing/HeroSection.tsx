@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 
 import Container from "../common/Container";
-import GradientButton from "../common/GradientButton";
+
 import GlassCard from "../common/GlassCard";
 import GlowBackground from "../common/GlowBackground";
 import FadeIn from "../common/FadeIn";
