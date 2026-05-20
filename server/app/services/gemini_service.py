@@ -1,34 +1,53 @@
-import google.generativeai as genai
 import os
+import google.generativeai as genai
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
+API_KEY = os.getenv(
+    "GEMINI_API_KEY"
+)
+
+if not API_KEY:
+    raise ValueError(
+        "GEMINI_API_KEY is missing"
+    )
+
 genai.configure(
-    api_key=os.getenv("GEMINI_API_KEY")
+    api_key=API_KEY
 )
 
 model = genai.GenerativeModel(
-    model_name="gemini-3.5-flash",
+    model_name="gemini-2.5-flash",
+
     system_instruction="""
-You are NeuroBiz AI — a smart, concise business assistant.
+You are NeuroBiz AI.
+
+You are a modern AI business assistant.
 
 Rules:
-- Keep responses short and practical.
-- Maximum 80 words unless user asks for details.
+- Keep responses concise.
+- Maximum 80 words.
+- Be professional and direct.
 - Avoid long introductions.
-- Avoid motivational or robotic language.
-- Be direct and professional.
+- Avoid motivational text.
+- Give actionable business advice.
 - Use bullet points when useful.
-- Focus on solving the user's problem quickly.
-- Ask at most ONE follow-up question.
-- Sound like a modern SaaS AI copilot.
+- Ask at most one follow-up question.
 """
 )
 
-async def generate_ai_response(user_message: str):
+
+async def generate_ai_response(
+    user_message: str
+):
+
     try:
+
+        print(
+            "Generating Gemini response..."
+        )
 
         response = model.generate_content(
             user_message,
@@ -41,10 +60,31 @@ async def generate_ai_response(user_message: str):
             }
         )
 
-        if response and response.text:
-            return response.text.strip()
+        print(
+            "Gemini response received"
+        )
 
-        return "Unable to generate response."
+        if (
+            response
+            and hasattr(response, "text")
+            and response.text
+        ):
 
-    except Exception:
-        return "AI service is temporarily unavailable."
+            return (
+                response.text.strip()
+            )
+
+        return (
+            "Unable to generate response."
+        )
+
+    except Exception as e:
+
+        print(
+            "Gemini Error:",
+            str(e)
+        )
+
+        return (
+            "AI service temporarily unavailable."
+        )
