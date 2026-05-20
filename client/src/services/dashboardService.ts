@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API =
-  "http://127.0.0.1:8000/api/dashboard";
+  `${import.meta.env.VITE_API_URL}/api/dashboard`;
 
 export const getDashboardStats =
   async () => {

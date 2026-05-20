@@ -37,7 +37,7 @@ const LeadsPage = () => {
       setLoading(true);
 
       await axios.post(
-        "http://127.0.0.1:8000/api/leads/",
+        `${import.meta.env.VITE_API_URL}/api/leads/`,
         form
       );
 
