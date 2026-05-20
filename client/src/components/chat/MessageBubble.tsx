@@ -8,9 +8,7 @@ import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 interface Props {
   role: "user" | "assistant";
-
   content: string;
-
   timestamp?: string;
 }
 
@@ -19,13 +17,21 @@ const MessageBubble = ({
   content,
   timestamp,
 }: Props) => {
-  const isUser = role === "user";
+
+  const isUser =
+    role === "user";
 
   return (
+
     <div
       className={`
         flex
-        ${isUser ? "justify-end" : "justify-start"}
+        w-full
+        ${
+          isUser
+            ? "justify-end"
+            : "justify-start"
+        }
       `}
     >
 
@@ -33,8 +39,13 @@ const MessageBubble = ({
         className={`
           flex
           gap-4
+          w-full
           max-w-4xl
-          ${isUser ? "flex-row-reverse" : ""}
+          ${
+            isUser
+              ? "flex-row-reverse"
+              : ""
+          }
         `}
       >
 
@@ -50,8 +61,16 @@ const MessageBubble = ({
             shrink-0
             ${
               isUser
-                ? "bg-gradient-to-r from-cyan-500 to-purple-600"
-                : "bg-white/10 border border-white/10"
+                ? `
+                  bg-gradient-to-r
+                  from-cyan-500
+                  to-purple-600
+                `
+                : `
+                  bg-white/10
+                  border
+                  border-white/10
+                `
             }
           `}
         >
@@ -66,10 +85,10 @@ const MessageBubble = ({
 
         </div>
 
-        {/* Content */}
-        <div>
+        {/* Message Area */}
+        <div className="flex-1 min-w-0">
 
-          {/* Message */}
+          {/* Message Bubble */}
           <div
             className={`
               rounded-[28px]
@@ -79,7 +98,9 @@ const MessageBubble = ({
               border
               transition-all
               duration-300
-              overflow-hidden
+              whitespace-pre-wrap
+              break-words
+              overflow-visible
               ${
                 isUser
                   ? `
@@ -98,7 +119,14 @@ const MessageBubble = ({
 
             {isUser ? (
 
-              <p className="leading-relaxed whitespace-pre-wrap text-[15px]">
+              <p
+                className="
+                  text-[15px]
+                  leading-7
+                  whitespace-pre-wrap
+                  break-words
+                "
+              >
 
                 {content}
 
@@ -106,16 +134,26 @@ const MessageBubble = ({
 
             ) : (
 
-              <div className="prose prose-invert max-w-none">
+              <div
+                className="
+                  prose
+                  prose-invert
+                  max-w-none
+                  whitespace-pre-wrap
+                  break-words
+                "
+              >
 
                 <ReactMarkdown
                   components={{
+
                     code({
                       inline,
                       className,
                       children,
                       ...props
                     }: any) {
+
                       const match =
                         /language-(\w+)/.exec(
                           className || ""
@@ -132,11 +170,14 @@ const MessageBubble = ({
                             padding: "20px",
                             background:
                               "rgba(0,0,0,0.4)",
+                            overflowX: "auto",
                           }}
                           {...props}
                         >
 
-                          {String(children).replace(
+                          {String(
+                            children
+                          ).replace(
                             /\n$/,
                             ""
                           )}
@@ -151,6 +192,7 @@ const MessageBubble = ({
                             px-2
                             py-1
                             rounded
+                            break-words
                           "
                           {...props}
                         >
@@ -182,7 +224,11 @@ const MessageBubble = ({
                 mt-2
                 text-xs
                 text-gray-500
-                ${isUser ? "text-right" : ""}
+                ${
+                  isUser
+                    ? "text-right"
+                    : ""
+                }
               `}
             >
 

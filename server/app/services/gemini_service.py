@@ -52,50 +52,11 @@ async def generate_ai_response(
                 "temperature": 0.7,
                 "top_p": 0.9,
                 "top_k": 40,
-                "max_output_tokens": 350,
+                "max_output_tokens": 500,
             }
         )
 
-        full_response = ""
-
-
-        if (
-            response.candidates
-            and len(response.candidates) > 0
-        ):
-
-            candidate = (
-                response.candidates[0]
-            )
-
-            if (
-                hasattr(candidate, "content")
-                and candidate.content.parts
-            ):
-
-                for part in (
-                    candidate.content.parts
-                ):
-
-                    if (
-                        hasattr(part, "text")
-                        and part.text
-                    ):
-
-                        full_response += (
-                            part.text
-                        )
-
-        full_response = (
-            full_response.strip()
-        )
-
-        if full_response:
-            return full_response
-
-        return (
-            "Unable to generate response."
-        )
+        return response.text.strip()
 
     except Exception as e:
 
