@@ -1,23 +1,32 @@
-import { useState } from "react";
-
 import {
-  Plus,
   MessageSquare,
+  Plus,
+  Pencil,
   Trash2,
   PanelLeftClose,
   PanelLeftOpen,
-  Search,
-  Pencil,
+  LayoutDashboard,
+  Users,
+  LogOut,
+  Bot,
 } from "lucide-react";
 
-import { useSidebarStore } from "../../store/sidebarStore";
+import {
+  NavLink,
+  useNavigate,
+} from "react-router-dom";
+
+import { useState } from "react";
+
 import { useChatStore } from "../../store/chatStore";
 
 const Sidebar = () => {
-  const {
-    collapsed,
-    toggleSidebar,
-  } = useSidebarStore();
+
+  const navigate =
+    useNavigate();
+
+  const [collapsed, setCollapsed] =
+    useState(false);
 
   const {
     conversations,
@@ -28,101 +37,112 @@ const Sidebar = () => {
     renameConversation,
   } = useChatStore();
 
-  const [editingId, setEditingId] =
-    useState<string | null>(null);
+  const navItems = [
+    {
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      path: "/dashboard",
+    },
 
-  const [editValue, setEditValue] =
-    useState("");
+    {
+      label: "AI Assistant",
+      icon: Bot,
+      path: "/chat",
+    },
 
-  const handleRename = (id: string) => {
-    renameConversation(
-      id,
-      editValue.trim() || "Untitled Chat"
-    );
-
-    setEditingId(null);
-  };
+    {
+      label: "Leads",
+      icon: Users,
+      path: "/leads",
+    },
+  ];
 
   return (
     <aside
       className={`
-        hidden
-        md:flex
-        flex-col
-        ${
-          collapsed
-            ? "w-[110px]"
-            : "w-[320px]"
-        }
         h-screen
-        shrink-0
         border-r
         border-white/10
         bg-black/20
-        backdrop-blur-2xl
+        backdrop-blur-xl
+        flex
+        flex-col
         transition-all
         duration-300
+        ${
+          collapsed
+            ? "w-24"
+            : "w-80"
+        }
       `}
     >
 
       {/* TOP */}
-      <div className="p-5 pt-4 pb-3 shrink-0">
+      <div className="p-5 border-b border-white/10">
 
-        {/* LOGO */}
-        <div>
-
-          <h2 className="text-3xl font-bold gradient-text">
-            NeuroBiz AI
-          </h2>
+        <div className="flex items-center justify-between">
 
           {!collapsed && (
-            <p className="mt-2 text-sm text-gray-400">
-              AI Business Operations Platform
-            </p>
+
+            <div>
+
+              <h1 className="text-2xl font-bold gradient-text">
+
+                NeuroBiz AI
+
+              </h1>
+
+              <p className="text-xs text-gray-400 mt-1">
+
+                Business Automation Platform
+
+              </p>
+
+            </div>
           )}
+
+          <button
+            onClick={() =>
+              setCollapsed(
+                !collapsed
+              )
+            }
+            className="
+              w-10
+              h-10
+              rounded-xl
+              bg-white/5
+              border
+              border-white/10
+              flex
+              items-center
+              justify-center
+              hover:bg-white/10
+              transition-all
+            "
+          >
+
+            {collapsed ? (
+              <PanelLeftOpen size={18} />
+            ) : (
+              <PanelLeftClose size={18} />
+            )}
+
+          </button>
 
         </div>
 
-        {/* COLLAPSE */}
-        <button
-          onClick={toggleSidebar}
-          className="
-            mt-3
-            w-full
-            flex
-            items-center
-            justify-center
-            py-1
-            rounded-2xl
-            border
-            border-white/10
-            bg-white/5
-            hover:bg-white/10
-            transition-all
-          "
-        >
-
-          {collapsed ? (
-            <PanelLeftOpen size={20} />
-          ) : (
-            <PanelLeftClose size={20} />
-          )}
-
-        </button>
-
         {/* NEW CHAT */}
         <button
-          onClick={() => {
-            createConversation();
-          }}
+          onClick={createConversation}
           className="
-            mt-3
+            mt-5
             w-full
             flex
             items-center
             justify-center
             gap-3
-            py-2
+            py-4
             rounded-2xl
             bg-gradient-to-r
             from-cyan-500
@@ -130,10 +150,11 @@ const Sidebar = () => {
             font-medium
             hover:scale-[1.02]
             transition-all
+            duration-300
           "
         >
 
-          <Plus size={20} />
+          <Plus size={18} />
 
           {!collapsed && (
             <span>
@@ -143,42 +164,55 @@ const Sidebar = () => {
 
         </button>
 
-        {/* SEARCH */}
-        {!collapsed && (
+      </div>
 
-          <div
-            className="
-              mt-3
-              flex
-              items-center
-              gap-3
-              px-4
-              py-1.5
-              rounded-2xl
-              border
-              border-white/10
-              bg-white/5
-            "
-          >
+      {/* NAVIGATION */}
+      <div className="px-4 py-4 space-y-2 border-b border-white/10">
 
-            <Search
-              size={18}
-              className="text-gray-400"
-            />
+        {navItems.map(
+          (item, index) => {
 
-            <input
-              placeholder="Search analyses..."
-              className="
-                w-full
-                bg-transparent
-                outline-none
-                text-sm
-                placeholder:text-gray-500
-              "
-            />
+            const Icon =
+              item.icon;
 
-          </div>
+            return (
 
+              <NavLink
+                key={index}
+                to={item.path}
+                className={({ isActive }) =>
+                  `
+                  flex
+                  items-center
+                  gap-3
+                  px-4
+                  py-3
+                  rounded-2xl
+                  transition-all
+                  duration-300
+
+                  ${
+                    isActive
+                      ? "bg-white/10 border border-white/10"
+                      : "hover:bg-white/5"
+                  }
+                  `
+                }
+              >
+
+                <Icon size={20} />
+
+                {!collapsed && (
+                  <span>
+
+                    {item.label}
+
+                  </span>
+                )}
+
+              </NavLink>
+            );
+          }
         )}
 
       </div>
@@ -188,273 +222,241 @@ const Sidebar = () => {
         className="
           flex-1
           overflow-y-auto
-          px-5
-          pb-5
           custom-scrollbar
+          p-4
+          space-y-3
         "
       >
 
         {!collapsed && (
-          <div className="mb-4">
 
-            <p className="text-xs uppercase text-gray-500 tracking-wider">
-              
-            </p>
+          <p className="text-xs text-gray-500 px-2 mb-3">
 
-            <p className="mt-1 text-xs text-gray-600">
-              
-            </p>
+            Recent Conversations
 
-          </div>
+          </p>
         )}
 
-        <div className="space-y-3">
-
-          {conversations.map((chat) => (
+        {conversations.map(
+          (chat) => (
 
             <div
               key={chat.id}
-              onClick={() =>
-                setActiveConversation(chat.id)
-              }
               className={`
                 group
-                flex
-                items-center
-                justify-between
-                gap-3
-                px-4
-                py-4
                 rounded-2xl
                 border
-                cursor-pointer
                 transition-all
+                duration-300
+                cursor-pointer
 
                 ${
                   activeConversationId ===
                   chat.id
-                    ? `
-                      bg-gradient-to-r
-                      from-cyan-500/20
-                      to-purple-500/20
-                      border-cyan-500/20
-                    `
-                    : `
-                      bg-white/5
-                      border-white/10
-                      hover:bg-white/10
-                    `
+                    ? "border-cyan-500/30 bg-cyan-500/10"
+                    : "border-white/5 bg-white/[0.03] hover:bg-white/[0.06]"
                 }
               `}
             >
 
-              {/* LEFT */}
-              <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div
+                onClick={() =>
+                  setActiveConversation(
+                    chat.id
+                  )
+                }
+                className="
+                  p-4
+                  flex
+                  items-start
+                  justify-between
+                  gap-3
+                "
+              >
 
-                <MessageSquare
-                  size={18}
-                  className="
-                    text-cyan-400
-                    shrink-0
-                  "
-                />
+                <div className="flex gap-3">
 
-                {!collapsed && (
+                  <div
+                    className="
+                      w-10
+                      h-10
+                      rounded-xl
+                      bg-gradient-to-r
+                      from-cyan-500
+                      to-purple-600
+                      flex
+                      items-center
+                      justify-center
+                      shrink-0
+                    "
+                  >
 
-                  <div className="min-w-0 w-full">
-
-                    {editingId ===
-                    chat.id ? (
-
-                      <input
-                        autoFocus
-                        value={editValue}
-                        onChange={(e) =>
-                          setEditValue(
-                            e.target.value
-                          )
-                        }
-                        onBlur={() =>
-                          handleRename(chat.id)
-                        }
-                        onClick={(e) =>
-                          e.stopPropagation()
-                        }
-                        onKeyDown={(e) => {
-
-                          if (
-                            e.key === "Enter"
-                          ) {
-                            handleRename(
-                              chat.id
-                            );
-                          }
-
-                          if (
-                            e.key === "Escape"
-                          ) {
-                            setEditingId(
-                              null
-                            );
-                          }
-
-                        }}
-                        className="
-                          w-full
-                          bg-transparent
-                          outline-none
-                          text-sm
-                          text-white
-                        "
-                      />
-
-                    ) : (
-
-                      <>
-                        <p className="truncate text-sm font-medium">
-                          {chat.title}
-                        </p>
-
-                        
-                      </>
-
-                    )}
+                    <MessageSquare
+                      size={16}
+                    />
 
                   </div>
 
+                  {!collapsed && (
+
+                    <div>
+
+                      <h3
+                        className="
+                          text-sm
+                          font-medium
+                          line-clamp-1
+                        "
+                      >
+
+                        {chat.title}
+
+                      </h3>
+
+                      <p
+                        className="
+                          text-xs
+                          text-gray-500
+                          mt-1
+                        "
+                      >
+
+                        {
+                          chat.messages
+                            .length
+                        }{" "}
+                        messages
+
+                      </p>
+
+                    </div>
+                  )}
+
+                </div>
+
+                {!collapsed && (
+
+                  <div
+                    className="
+                      flex
+                      gap-2
+                      opacity-0
+                      group-hover:opacity-100
+                      transition-all
+                    "
+                  >
+
+                    <button
+                      onClick={(e) => {
+
+                        e.stopPropagation();
+
+                        const newTitle =
+                          prompt(
+                            "Rename chat"
+                          );
+
+                        if (
+                          newTitle
+                        ) {
+
+                          renameConversation(
+                            chat.id,
+                            newTitle
+                          );
+                        }
+                      }}
+                      className="
+                        w-8
+                        h-8
+                        rounded-lg
+                        hover:bg-white/10
+                        flex
+                        items-center
+                        justify-center
+                      "
+                    >
+
+                      <Pencil
+                        size={14}
+                      />
+
+                    </button>
+
+                    <button
+                      onClick={(e) => {
+
+                        e.stopPropagation();
+
+                        deleteConversation(
+                          chat.id
+                        );
+                      }}
+                      className="
+                        w-8
+                        h-8
+                        rounded-lg
+                        hover:bg-red-500/10
+                        text-red-400
+                        flex
+                        items-center
+                        justify-center
+                      "
+                    >
+
+                      <Trash2
+                        size={14}
+                      />
+
+                    </button>
+
+                  </div>
                 )}
 
               </div>
 
-              {/* ACTIONS */}
-              {!collapsed && (
-
-                <div
-                  className="
-                    flex
-                    items-center
-                    gap-3
-                    opacity-0
-                    group-hover:opacity-100
-                    transition-all
-                  "
-                >
-
-                  {/* RENAME */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-
-                      setEditingId(
-                        chat.id
-                      );
-
-                      setEditValue(
-                        chat.title
-                      );
-                    }}
-                  >
-
-                    <Pencil
-                      size={15}
-                      className="
-                        text-gray-400
-                        hover:text-cyan-400
-                        transition-all
-                      "
-                    />
-
-                  </button>
-
-                  {/* DELETE */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-
-                      deleteConversation(
-                        chat.id
-                      );
-                    }}
-                  >
-
-                    <Trash2
-                      size={16}
-                      className="
-                        text-gray-400
-                        hover:text-red-400
-                        transition-all
-                      "
-                    />
-
-                  </button>
-
-                </div>
-
-              )}
-
             </div>
-
-          ))}
-
-        </div>
+          )
+        )}
 
       </div>
 
-      {/* BOTTOM */}
-      <div className="p-5 shrink-0">
+      {/* LOGOUT */}
+      <div className="p-4 border-t border-white/10">
 
-        <div
+        <button
+          onClick={() => {
+
+            localStorage.removeItem(
+              "isAuth"
+            );
+
+            navigate("/login");
+          }}
           className="
-            p-4
-            rounded-3xl
-            border
-            border-white/10
-            bg-white/5
-            backdrop-blur-xl
+            w-full
+            flex
+            items-center
+            justify-center
+            gap-3
+            py-4
+            rounded-2xl
+            bg-red-500/10
+            text-red-400
+            hover:bg-red-500/20
+            transition-all
           "
         >
 
-          <div className="flex items-center gap-4">
+          <LogOut size={18} />
 
-            <div
-              className="
-                w-12
-                h-12
-                rounded-2xl
-                bg-gradient-to-r
-                from-cyan-500
-                to-purple-600
-                flex
-                items-center
-                justify-center
-                font-bold
-                shrink-0
-              "
-            >
+          {!collapsed && (
+            <span>
+              Logout
+            </span>
+          )}
 
-              K
-
-            </div>
-
-            {!collapsed && (
-
-              <div>
-
-                <h4 className="font-medium">
-                  Kaushal
-                </h4>
-
-                <p className="text-sm text-gray-400">
-                  Premium Account
-                </p>
-
-              </div>
-
-            )}
-
-          </div>
-
-        </div>
+        </button>
 
       </div>
 

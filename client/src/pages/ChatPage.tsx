@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import DashboardLayout from "../layouts/DashboardLayout";
 
@@ -7,16 +7,35 @@ import ChatWindow from "../components/chat/ChatWindow";
 import { useChatStore } from "../store/chatStore";
 
 const ChatPage = () => {
+
   const [input, setInput] =
     useState("");
 
-  const { sendMessage } =
-    useChatStore();
+  const {
+    sendMessage,
+    loadHistory,
+    isTyping,
+  } = useChatStore();
+
+  useEffect(() => {
+
+    loadHistory();
+
+  }, []);
+
+  const handleSendMessage = () => {
+
+    if (!input.trim()) return;
+
+    sendMessage(input);
+
+    setInput("");
+  };
 
   return (
     <DashboardLayout>
 
-      <div className="h-full flex flex-col">
+      <div className="h-full flex flex-col overflow-hidden">
 
         {/* HEADER */}
         <div
@@ -37,11 +56,15 @@ const ChatPage = () => {
           <div>
 
             <h2 className="text-2xl font-bold">
-              AI Assistant
+
+              NeuroBiz AI Assistant
+
             </h2>
 
             <p className="text-sm text-gray-400 mt-1">
-              Real-time intelligent business automation
+
+              AI-powered business automation & analytics
+
             </p>
 
           </div>
@@ -59,13 +82,15 @@ const ChatPage = () => {
             "
           >
 
-            AI Online
+            {isTyping
+              ? "AI Thinking..."
+              : "AI Online"}
 
           </div>
 
         </div>
 
-        {/* CHAT */}
+        {/* CHAT WINDOW */}
         <div className="flex-1 overflow-hidden">
 
           <ChatWindow />
@@ -100,13 +125,15 @@ const ChatPage = () => {
           >
 
             <textarea
-              placeholder="Ask NeuroBiz AI anything..."
+              placeholder="Ask NeuroBiz AI about automation, growth, analytics..."
               rows={1}
               value={input}
               onChange={(e) =>
                 setInput(e.target.value)
               }
+
               onInput={(e) => {
+
                 const target =
                   e.currentTarget;
 
@@ -114,21 +141,22 @@ const ChatPage = () => {
                   "24px";
 
                 target.style.height =
-                  target.scrollHeight +
-                  "px";
+                  `${target.scrollHeight}px`;
               }}
+
               onKeyDown={(e) => {
+
                 if (
                   e.key === "Enter" &&
                   !e.shiftKey
                 ) {
+
                   e.preventDefault();
 
-                  sendMessage(input);
-
-                  setInput("");
+                  handleSendMessage();
                 }
               }}
+
               className="
                 flex-1
                 bg-transparent
@@ -137,16 +165,13 @@ const ChatPage = () => {
                 text-white
                 placeholder:text-gray-500
                 max-h-[200px]
+                overflow-y-auto
                 custom-scrollbar
               "
             />
 
             <button
-              onClick={() => {
-                sendMessage(input);
-
-                setInput("");
-              }}
+              onClick={handleSendMessage}
               className="
                 px-6
                 py-3

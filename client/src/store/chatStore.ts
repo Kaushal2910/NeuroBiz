@@ -1,7 +1,12 @@
 import { create } from "zustand";
-import { sendChatMessage } from "../services/chatService";
+
+import {
+  sendChatMessage,
+  getChatHistory,
+} from "../services/chatService";
+
 export interface ChatMessage {
-  id: string;
+  id: number;
 
   role: "user" | "assistant";
 
@@ -11,7 +16,7 @@ export interface ChatMessage {
 }
 
 export interface Conversation {
-  id: string;
+  id: number;
 
   title: string;
 
@@ -19,57 +24,65 @@ export interface Conversation {
 }
 
 interface ChatStore {
+
   conversations: Conversation[];
 
-  activeConversationId: string;
+  activeConversationId: number;
 
   isTyping: boolean;
 
   createConversation: () => void;
 
   setActiveConversation: (
-    id: string
+    id: number
   ) => void;
 
   deleteConversation: (
-    id: string
+    id: number
   ) => void;
 
   renameConversation: (
-    id: string,
+    id: number,
     title: string
   ) => void;
 
   sendMessage: (
     content: string
-  ) => void;
+  ) => Promise<void>;
+
+  loadHistory: () => Promise<void>;
 }
 
-const generateId = () => {
-  return crypto.randomUUID();
-};
-
 const getTime = () => {
-  return new Date().toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+
+  return new Date().toLocaleTimeString(
+    [],
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  );
 };
 
-const initialConversationId =
-  generateId();
+const generateId = () => {
+
+  return Math.floor(
+    Math.random() * 100000000
+  );
+};
 
 export const useChatStore =
   create<ChatStore>((set, get) => ({
+
     conversations: [
       {
-        id: initialConversationId,
+        id: 1,
 
         title: "New Conversation",
 
         messages: [
           {
-            id: generateId(),
+            id: 1,
 
             role: "assistant",
 
@@ -82,34 +95,101 @@ export const useChatStore =
       },
     ],
 
-    activeConversationId:
-      initialConversationId,
+    activeConversationId: 1,
 
     isTyping: false,
 
+    loadHistory: async () => {
+
+      try {
+
+        const history =
+          await getChatHistory();
+
+        const formatted =
+          history.map(
+            (
+              item: any,
+              index: number
+            ) => ({
+              id: index + 1,
+
+              title:
+                item.user_message.slice(
+                  0,
+                  30
+                ),
+
+              messages: [
+                {
+                  id:
+                    generateId(),
+
+                  role: "user",
+
+                  content:
+                    item.user_message,
+
+                  timestamp:
+                    "Now",
+                },
+
+                {
+                  id:
+                    generateId(),
+
+                  role:
+                    "assistant",
+
+                  content:
+                    item.ai_response,
+
+                  timestamp:
+                    "Now",
+                },
+              ],
+            })
+          );
+
+        if (
+          formatted.length > 0
+        ) {
+
+          set({
+            conversations:
+              formatted,
+
+            activeConversationId:
+              formatted[0].id,
+          });
+        }
+
+      } catch (error) {
+
+        console.error(error);
+      }
+    },
+
     createConversation: () => {
-      const newConversationId =
-        generateId();
 
-      const newConversation: Conversation =
-        {
-          id: newConversationId,
+      const newConversation = {
+        id: generateId(),
 
-          title: "Untitled Chat",
+        title: "Untitled Chat",
 
-          messages: [
-            {
-              id: generateId(),
+        messages: [
+          {
+            id: generateId(),
 
-              role: "assistant",
+            role: "assistant",
 
-              content:
-                "Hello 👋 Start a new conversation with NeuroBiz AI.",
+            content:
+              "Hello 👋 Start a new business conversation with NeuroBiz AI.",
 
-              timestamp: getTime(),
-            },
-          ],
-        };
+            timestamp: getTime(),
+          },
+        ],
+      };
 
       set((state) => ({
         conversations: [
@@ -118,33 +198,36 @@ export const useChatStore =
         ],
 
         activeConversationId:
-          newConversationId,
+          newConversation.id,
       }));
     },
 
     setActiveConversation: (
       id
     ) => {
+
       set({
         activeConversationId: id,
       });
     },
 
-    deleteConversation: (id) => {
+    deleteConversation: (
+      id
+    ) => {
+
       const state = get();
 
-      const updatedConversations =
+      const updated =
         state.conversations.filter(
-          (chat) => chat.id !== id
+          (chat) =>
+            chat.id !== id
         );
 
       set({
-        conversations:
-          updatedConversations,
+        conversations: updated,
 
         activeConversationId:
-          updatedConversations[0]?.id ||
-          "",
+          updated[0]?.id || 0,
       });
     },
 
@@ -152,6 +235,7 @@ export const useChatStore =
       id,
       title
     ) => {
+
       set((state) => ({
         conversations:
           state.conversations.map(
@@ -166,35 +250,38 @@ export const useChatStore =
       }));
     },
 
-    sendMessage: (content) => {
-      if (!content.trim()) return;
+    sendMessage: async (
+      content
+    ) => {
+
+      if (!content.trim())
+        return;
 
       const state = get();
 
       const currentConversation =
         state.conversations.find(
-          (chat) =>
-            chat.id ===
+          (c) =>
+            c.id ===
             state.activeConversationId
         );
 
-      if (!currentConversation)
+      if (
+        !currentConversation
+      )
         return;
 
-      const userMessage: ChatMessage = {
-        id: generateId(),
+      const userMessage: ChatMessage =
+        {
+          id: generateId(),
 
-        role: "user",
+          role: "user",
 
-        content,
+          content,
 
-        timestamp: getTime(),
-      };
-
-      const updatedMessages = [
-        ...currentConversation.messages,
-        userMessage,
-      ];
+          timestamp:
+            getTime(),
+        };
 
       set({
         conversations:
@@ -205,8 +292,10 @@ export const useChatStore =
                 ? {
                     ...chat,
 
-                    messages:
-                      updatedMessages,
+                    messages: [
+                      ...chat.messages,
+                      userMessage,
+                    ],
 
                     title:
                       chat.title ===
@@ -223,81 +312,56 @@ export const useChatStore =
         isTyping: true,
       });
 
-      
-      (async () => {
-  try {
-    const aiResponse =
-      await sendChatMessage(content);
+      try {
 
-    const aiMessage: ChatMessage = {
-      id: generateId(),
+        const aiResponse =
+          await sendChatMessage(
+            content
+          );
 
-      role: "assistant",
+        const aiMessage: ChatMessage =
+          {
+            id: generateId(),
 
-      content: aiResponse,
+            role: "assistant",
 
-      timestamp: getTime(),
-    };
+            content:
+              aiResponse,
 
-    const latestState = get();
+            timestamp:
+              getTime(),
+          };
 
-    set({
-      conversations:
-        latestState.conversations.map(
-          (chat) =>
-            chat.id ===
-            currentConversation.id
-              ? {
-                  ...chat,
+        const latestState =
+          get();
 
-                  messages: [
-                    ...chat.messages,
-                    aiMessage,
-                  ],
-                }
-              : chat
-        ),
+        set({
+          conversations:
+            latestState.conversations.map(
+              (chat) =>
+                chat.id ===
+                currentConversation.id
+                  ? {
+                      ...chat,
 
-      isTyping: false,
-    });
+                      messages: [
+                        ...chat.messages,
+                        aiMessage,
+                      ],
+                    }
+                  : chat
+            ),
 
-  } catch (error) {
-    console.error(error);
+          isTyping: false,
+        });
 
-    const errorMessage: ChatMessage =
-      {
-        id: generateId(),
+      } catch (error) {
 
-        role: "assistant",
+        console.error(error);
 
-        content:
-          "Failed to connect with NeuroBiz AI backend.",
-
-        timestamp: getTime(),
-      };
-
-    const latestState = get();
-
-    set({
-      conversations:
-        latestState.conversations.map(
-          (chat) =>
-            chat.id ===
-            currentConversation.id
-              ? {
-                  ...chat,
-
-                  messages: [
-                    ...chat.messages,
-                    errorMessage,
-                  ],
-                }
-              : chat
-        ),
-
-      isTyping: false,
-    });
-  }
-})();
+        set({
+          isTyping: false,
+        });
+      }
     },
   }));

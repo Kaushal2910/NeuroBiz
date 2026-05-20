@@ -11,8 +11,11 @@ import GlassCard from "../common/GlassCard";
 import GlowBackground from "../common/GlowBackground";
 import FadeIn from "../common/FadeIn";
 import FloatingElement from "../common/FloatingElement";
+import { useNavigate } from "react-router-dom";
+
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   return (
     <section className="relative overflow-hidden py-24 lg:min-h-screen flex items-center">
 
@@ -72,32 +75,62 @@ const HeroSection = () => {
             </p>
 
             {/* CTA Buttons */}
-            <div className="mt-10 flex flex-wrap gap-4">
+            {/* CTA Buttons */}
+<div className="mt-10 flex flex-wrap gap-4">
 
-              <GradientButton
-                text="Get Started"
-                icon={<ArrowRight size={18} />}
-              />
+  <button
+    onClick={() =>
+      navigate("/chat")
+    }
+    className="
+      px-8
+      py-4
+      rounded-2xl
+      bg-gradient-to-r
+      from-cyan-500
+      to-purple-600
+      text-white
+      font-semibold
+      flex
+      items-center
+      gap-2
+      hover:scale-[1.03]
+      transition-all
+      duration-300
+    "
+  >
 
-              <button
-                className="
-                  px-8
-                  py-4
-                  rounded-2xl
-                  border
-                  border-white/10
-                  bg-white/5
-                  backdrop-blur-xl
-                  hover:bg-white/10
-                  transition-all
-                  duration-300
-                  text-white
-                "
-              >
-                Live Demo
-              </button>
+    Launch AI Assistant
 
-            </div>
+    <ArrowRight size={18} />
+
+  </button>
+
+  <button
+    onClick={() =>
+      navigate("/dashboard")
+    }
+    className="
+      px-8
+      py-4
+      rounded-2xl
+      border
+      border-white/10
+      bg-white/5
+      backdrop-blur-xl
+      hover:bg-white/10
+      transition-all
+      duration-300
+      text-white
+    "
+  >
+
+    View Dashboard
+
+  </button>
+
+</div>
+            
 
             {/* Stats */}
             <div className="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-8">
