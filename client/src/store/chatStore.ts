@@ -1,5 +1,5 @@
 import { create } from "zustand";
-
+import { sendChatMessage } from "../services/chatService";
 export interface ChatMessage {
   id: string;
 
@@ -223,54 +223,81 @@ export const useChatStore =
         isTyping: true,
       });
 
-      setTimeout(() => {
-        const aiMessage: ChatMessage = {
-          id: generateId(),
+      
+      (async () => {
+  try {
+    const aiResponse =
+      await sendChatMessage(content);
 
-          role: "assistant",
+    const aiMessage: ChatMessage = {
+      id: generateId(),
 
-          content: `
-### AI Business Insight
+      role: "assistant",
 
-NeuroBiz AI analyzed your request and generated intelligent recommendations.
+      content: aiResponse,
 
-• Automate workflows  
-• Improve customer engagement  
-• Increase lead conversion  
-• Generate AI analytics  
-• Streamline operations  
+      timestamp: getTime(),
+    };
 
-\`\`\`python
-def automate_business():
-    improve_efficiency()
-    generate_ai_insights()
-\`\`\`
-          `,
+    const latestState = get();
 
-          timestamp: getTime(),
-        };
+    set({
+      conversations:
+        latestState.conversations.map(
+          (chat) =>
+            chat.id ===
+            currentConversation.id
+              ? {
+                  ...chat,
 
-        const latestState = get();
+                  messages: [
+                    ...chat.messages,
+                    aiMessage,
+                  ],
+                }
+              : chat
+        ),
 
-        set({
-          conversations:
-            latestState.conversations.map(
-              (chat) =>
-                chat.id ===
-                currentConversation.id
-                  ? {
-                      ...chat,
+      isTyping: false,
+    });
 
-                      messages: [
-                        ...chat.messages,
-                        aiMessage,
-                      ],
-                    }
-                  : chat
-            ),
+  } catch (error) {
+    console.error(error);
 
-          isTyping: false,
-        });
-      }, 2000);
+    const errorMessage: ChatMessage =
+      {
+        id: generateId(),
+
+        role: "assistant",
+
+        content:
+          "Failed to connect with NeuroBiz AI backend.",
+
+        timestamp: getTime(),
+      };
+
+    const latestState = get();
+
+    set({
+      conversations:
+        latestState.conversations.map(
+          (chat) =>
+            chat.id ===
+            currentConversation.id
+              ? {
+                  ...chat,
+
+                  messages: [
+                    ...chat.messages,
+                    errorMessage,
+                  ],
+                }
+              : chat
+        ),
+
+      isTyping: false,
+    });
+  }
+})();
     },
   }));

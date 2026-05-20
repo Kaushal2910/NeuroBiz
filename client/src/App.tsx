@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ChatPage from "./pages/ChatPage";
 import DashboardPage from "./pages/DashboardPage";
+import LeadsPage from "./pages/leads/LeadsPage";
 
 function App() {
   return (
@@ -14,6 +15,8 @@ function App() {
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/chat" element={<ChatPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/leads" element={<LeadsPage />}
+/>
     </Routes>
   );
 }

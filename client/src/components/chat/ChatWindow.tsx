@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import MessageBubble from "./MessageBubble";
 
 import TypingIndicator from "./TypingIndicator";
-
+import QuickActions from "./QuickActions";
 import { useChatStore } from "../../store/chatStore";
 
 const ChatWindow = () => {
@@ -34,7 +34,13 @@ const ChatWindow = () => {
     <div className="h-full overflow-y-auto px-6 py-10 custom-scrollbar ">
      
 
-      <div className="max-w-5xl mx-auto space-y-8">
+      <div className="max-w-6xl mx-auto space-y-10">
+        {currentConversation &&
+        currentConversation.messages.length === 1 && (
+
+          <QuickActions />
+
+        )}
 
         {currentConversation?.messages.map(
           (message) => (

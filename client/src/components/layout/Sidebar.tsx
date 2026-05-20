@@ -1,39 +1,54 @@
-//C:\Users\sonaw\OneDrive\Desktop\NeuroBiz\client\src\components\layout\Sidebar.tsx
+import { useState } from "react";
+
 import {
   Plus,
   MessageSquare,
-  Settings,
-  LayoutDashboard,
   Trash2,
   PanelLeftClose,
   PanelLeftOpen,
   Search,
+  Pencil,
 } from "lucide-react";
 
 import { useSidebarStore } from "../../store/sidebarStore";
-
 import { useChatStore } from "../../store/chatStore";
-import { useEffect, useRef } from "react";
-
 
 const Sidebar = () => {
-  const { collapsed, toggleSidebar } =
-    useSidebarStore();
-  
+  const {
+    collapsed,
+    toggleSidebar,
+  } = useSidebarStore();
+
   const {
     conversations,
     activeConversationId,
     setActiveConversation,
     createConversation,
     deleteConversation,
+    renameConversation,
   } = useChatStore();
 
+  const [editingId, setEditingId] =
+    useState<string | null>(null);
+
+  const [editValue, setEditValue] =
+    useState("");
+
+  const handleRename = (id: string) => {
+    renameConversation(
+      id,
+      editValue.trim() || "Untitled Chat"
+    );
+
+    setEditingId(null);
+  };
 
   return (
     <aside
       className={`
         hidden
         md:flex
+        flex-col
         ${
           collapsed
             ? "w-[110px]"
@@ -45,339 +60,399 @@ const Sidebar = () => {
         border-white/10
         bg-black/20
         backdrop-blur-2xl
-        flex-col
-        p-5
         transition-all
-        duration-500
+        duration-300
       `}
-
-
     >
 
-      {/* LOGO */}
-      <div>
+      {/* TOP */}
+      <div className="p-5 pt-4 pb-3 shrink-0">
 
-        <h2 className="text-3xl font-bold gradient-text">
-          NeuroBiz AI
-        </h2>
+        {/* LOGO */}
+        <div>
 
-        <p className="mt-2 text-sm text-gray-400">
-          {!collapsed &&
-            "AI Business Platform"}
-        </p>
+          <h2 className="text-3xl font-bold gradient-text">
+            NeuroBiz AI
+          </h2>
 
-      </div>
+          {!collapsed && (
+            <p className="mt-2 text-sm text-gray-400">
+              AI Business Operations Platform
+            </p>
+          )}
 
-      {/* COLLAPSE BUTTON */}
-      <button
-        onClick={toggleSidebar}
-        className="
-          mt-6
-          w-full
-          flex
-          items-center
-          justify-center
-          py-3
-          rounded-2xl
-          border
-          border-white/10
-          bg-white/5
-          hover:bg-white/10
-          transition-all
-        "
-      >
+        </div>
 
-        {collapsed ? (
-          <PanelLeftOpen size={20} />
-        ) : (
-          <PanelLeftClose size={20} />
-        )}
-
-      </button>
-
-      {/* NEW CHAT */}
-      <button 
-        onClick={createConversation}
-        className="
-          mt-8
-          flex
-          items-center
-          justify-center
-          gap-3
-          py-4
-          rounded-2xl
-          bg-gradient-to-r
-          from-cyan-500
-          to-purple-600
-          font-medium
-          transition-all
-          duration-300
-          hover:scale-[1.02]
-        "
-      >
-
-        <Plus size={20} />
-
-        {!collapsed && "New Chat"}
-
-      </button>
-
-      {/* SEARCH */}
-      {!collapsed && (
-
-        <div
+        {/* COLLAPSE */}
+        <button
+          onClick={toggleSidebar}
           className="
-            mt-5
+            mt-3
+            w-full
             flex
             items-center
-            gap-3
-            px-4
-            py-3
+            justify-center
+            py-1
             rounded-2xl
             border
             border-white/10
             bg-white/5
+            hover:bg-white/10
+            transition-all
           "
         >
 
-          <Search
-            size={18}
-            className="text-gray-400"
-          />
+          {collapsed ? (
+            <PanelLeftOpen size={20} />
+          ) : (
+            <PanelLeftClose size={20} />
+          )}
 
-          <input
-            placeholder="Search chats..."
-            className="
-              bg-transparent
-              outline-none
-              text-sm
-              placeholder:text-gray-500
-              w-full
-            "
-          />
+        </button>
 
-        </div>
+        {/* NEW CHAT */}
+        <button
+          onClick={() => {
+            createConversation();
+          }}
+          className="
+            mt-3
+            w-full
+            flex
+            items-center
+            justify-center
+            gap-3
+            py-2
+            rounded-2xl
+            bg-gradient-to-r
+            from-cyan-500
+            to-purple-600
+            font-medium
+            hover:scale-[1.02]
+            transition-all
+          "
+        >
 
-      )}
+          <Plus size={20} />
 
-      {/* NAVIGATION */}
-      <div className="mt-10">
+          {!collapsed && (
+            <span>
+              New Chat
+            </span>
+          )}
 
+        </button>
+
+        {/* SEARCH */}
         {!collapsed && (
-          <p className="text-xs uppercase text-gray-500 tracking-wider mb-4">
 
-            Navigation
+          <div
+            className="
+              mt-3
+              flex
+              items-center
+              gap-3
+              px-4
+              py-1.5
+              rounded-2xl
+              border
+              border-white/10
+              bg-white/5
+            "
+          >
 
-          </p>
+            <Search
+              size={18}
+              className="text-gray-400"
+            />
+
+            <input
+              placeholder="Search analyses..."
+              className="
+                w-full
+                bg-transparent
+                outline-none
+                text-sm
+                placeholder:text-gray-500
+              "
+            />
+
+          </div>
+
         )}
-
-        <div className="space-y-3">
-
-          <button
-            className="
-              w-full
-              flex
-              items-center
-              gap-3
-              px-4
-              py-3
-              rounded-2xl
-              bg-white/5
-              border
-              border-white/10
-              hover:bg-white/10
-              transition-all
-            "
-          >
-
-            <LayoutDashboard size={18} />
-
-            {!collapsed && "Dashboard"}
-
-          </button>
-
-          <button
-            className="
-              w-full
-              flex
-              items-center
-              gap-3
-              px-4
-              py-3
-              rounded-2xl
-              bg-white/5
-              border
-              border-white/10
-              hover:bg-white/10
-              transition-all
-            "
-          >
-
-            <Settings size={18} />
-
-            {!collapsed && "Settings"}
-
-          </button>
-
-        </div>
 
       </div>
 
-      {/* CHAT HISTORY */}
-      <div className="mt-10 flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-1">
+      {/* CHAT LIST */}
+      <div
+        className="
+          flex-1
+          overflow-y-auto
+          px-5
+          pb-5
+          custom-scrollbar
+        "
+      >
 
         {!collapsed && (
-          <p className="text-xs uppercase text-gray-500 tracking-wider mb-4">
+          <div className="mb-4">
 
-            Recent Chats
+            <p className="text-xs uppercase text-gray-500 tracking-wider">
+              
+            </p>
 
-          </p>
+            <p className="mt-1 text-xs text-gray-600">
+              
+            </p>
+
+          </div>
         )}
 
         <div className="space-y-3">
 
           {conversations.map((chat) => (
 
-  <div
-    key={chat.id}
-    onClick={() =>
-      setActiveConversation(chat.id)
-    }
-    className={`
-      group
-      flex
-      items-center
-      justify-between
-      gap-3
-      px-4
-      py-4
-      rounded-2xl
-      border
-      transition-all
-      cursor-pointer
+            <div
+              key={chat.id}
+              onClick={() =>
+                setActiveConversation(chat.id)
+              }
+              className={`
+                group
+                flex
+                items-center
+                justify-between
+                gap-3
+                px-4
+                py-4
+                rounded-2xl
+                border
+                cursor-pointer
+                transition-all
 
-      ${
-        activeConversationId ===
-        chat.id
-          ? `
-            bg-gradient-to-r
-            from-cyan-500/20
-            to-purple-500/20
-            border-cyan-500/20
-          `
-          : `
-            bg-white/5
-            border-white/10
-            hover:bg-white/10
-          `
-      }
-    `}
-  >
+                ${
+                  activeConversationId ===
+                  chat.id
+                    ? `
+                      bg-gradient-to-r
+                      from-cyan-500/20
+                      to-purple-500/20
+                      border-cyan-500/20
+                    `
+                    : `
+                      bg-white/5
+                      border-white/10
+                      hover:bg-white/10
+                    `
+                }
+              `}
+            >
 
-    <div className="flex items-center gap-3 min-w-0">
+              {/* LEFT */}
+              <div className="flex items-center gap-3 min-w-0 flex-1">
 
-      <MessageSquare
-        size={18}
-        className="text-cyan-400 shrink-0"
-      />
+                <MessageSquare
+                  size={18}
+                  className="
+                    text-cyan-400
+                    shrink-0
+                  "
+                />
 
-      {!collapsed && (
+                {!collapsed && (
 
-        <p className="truncate text-sm">
-          {chat.title}
-        </p>
+                  <div className="min-w-0 w-full">
 
-      )}
+                    {editingId ===
+                    chat.id ? (
 
-    </div>
+                      <input
+                        autoFocus
+                        value={editValue}
+                        onChange={(e) =>
+                          setEditValue(
+                            e.target.value
+                          )
+                        }
+                        onBlur={() =>
+                          handleRename(chat.id)
+                        }
+                        onClick={(e) =>
+                          e.stopPropagation()
+                        }
+                        onKeyDown={(e) => {
 
-    {!collapsed && (
+                          if (
+                            e.key === "Enter"
+                          ) {
+                            handleRename(
+                              chat.id
+                            );
+                          }
 
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
+                          if (
+                            e.key === "Escape"
+                          ) {
+                            setEditingId(
+                              null
+                            );
+                          }
 
-          deleteConversation(chat.id);
-        }}
-        className="
-          opacity-0
-          group-hover:opacity-100
-          transition-all
-        "
-      >
+                        }}
+                        className="
+                          w-full
+                          bg-transparent
+                          outline-none
+                          text-sm
+                          text-white
+                        "
+                      />
 
-        <Trash2
-          size={16}
-          className="
-            text-gray-400
-            hover:text-red-400
-          "
-        />
+                    ) : (
 
-      </button>
+                      <>
+                        <p className="truncate text-sm font-medium">
+                          {chat.title}
+                        </p>
 
-    )}
+                        
+                      </>
 
-  </div>
+                    )}
 
-))}
+                  </div>
+
+                )}
+
+              </div>
+
+              {/* ACTIONS */}
+              {!collapsed && (
+
+                <div
+                  className="
+                    flex
+                    items-center
+                    gap-3
+                    opacity-0
+                    group-hover:opacity-100
+                    transition-all
+                  "
+                >
+
+                  {/* RENAME */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+
+                      setEditingId(
+                        chat.id
+                      );
+
+                      setEditValue(
+                        chat.title
+                      );
+                    }}
+                  >
+
+                    <Pencil
+                      size={15}
+                      className="
+                        text-gray-400
+                        hover:text-cyan-400
+                        transition-all
+                      "
+                    />
+
+                  </button>
+
+                  {/* DELETE */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+
+                      deleteConversation(
+                        chat.id
+                      );
+                    }}
+                  >
+
+                    <Trash2
+                      size={16}
+                      className="
+                        text-gray-400
+                        hover:text-red-400
+                        transition-all
+                      "
+                    />
+
+                  </button>
+
+                </div>
+
+              )}
+
+            </div>
+
+          ))}
 
         </div>
 
       </div>
 
-      {/* PROFILE */}
-      <div
-        className={`
-          mt-6
-          p-4
-          rounded-3xl
-          border
-          border-white/10
-          bg-white/5
-          backdrop-blur-xl
-          transition-all
-          duration-300
-        `}
-      >
+      {/* BOTTOM */}
+      <div className="p-5 shrink-0">
 
-        <div className="flex items-center gap-4">
+        <div
+          className="
+            p-4
+            rounded-3xl
+            border
+            border-white/10
+            bg-white/5
+            backdrop-blur-xl
+          "
+        >
 
-          <div
-            className="
-              w-12
-              h-12
-              rounded-2xl
-              bg-gradient-to-r
-              from-cyan-500
-              to-purple-600
-              flex
-              items-center
-              justify-center
-              font-bold
-              shrink-0
-            "
-          >
+          <div className="flex items-center gap-4">
 
-            K
+            <div
+              className="
+                w-12
+                h-12
+                rounded-2xl
+                bg-gradient-to-r
+                from-cyan-500
+                to-purple-600
+                flex
+                items-center
+                justify-center
+                font-bold
+                shrink-0
+              "
+            >
 
-          </div>
-
-          {!collapsed && (
-
-            <div>
-
-              <h4 className="font-medium">
-                Kaushal
-              </h4>
-
-              <p className="text-sm text-gray-400">
-                Premium Account
-              </p>
+              K
 
             </div>
 
-          )}
+            {!collapsed && (
+
+              <div>
+
+                <h4 className="font-medium">
+                  Kaushal
+                </h4>
+
+                <p className="text-sm text-gray-400">
+                  Premium Account
+                </p>
+
+              </div>
+
+            )}
+
+          </div>
 
         </div>
 
